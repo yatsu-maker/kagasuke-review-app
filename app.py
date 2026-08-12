@@ -79,4 +79,10 @@ if st.button("返信文を生成する", type="primary"):
             st.text_area("生成された返信文（枠内をクリックし、すべて選択してコピーしてください）", response.text, height=300)
 
         except Exception as e:
-            st.error(f"エラーが発生しました: {e}")
+            error_msg = str(e).lower()
+            if "503" in error_msg or "high demand" in error_msg:
+                st.error("⚠️ 現在、AIのサーバーが混み合っています。数秒〜1分ほど待ってから、もう一度ボタンを押してください。")
+            elif "429" in error_msg or "quota" in error_msg:
+                st.error("⚠️ 短時間の利用制限にかかりました。1分ほど待ってから再度お試しください。")
+            else:
+                st.error(f"⚠️ エラーが発生しました。少し時間をおいてやり直してください。（詳細: {e}）")
