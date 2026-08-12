@@ -35,7 +35,15 @@ if st.button("返信文を生成する", type="primary"):
     else:
         try:
             genai.configure(api_key=api_key)
-            model = genai.GenerativeModel('gemini-flash')
+            
+            # あなたのAPIキーで現在利用可能なモデルを自動で一覧取得する
+            available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+            # その中から高速な「flash」モデルを優先的に探す
+            flash_models = [name for name in available_models if 'flash' in name.lower()]
+            # 見つかったモデルを自動で設定する
+            target_model_name = flash_models[0] if flash_models else available_models[0]
+            
+            model = genai.GenerativeModel(target_model_name)
 
             # ★加賀助のナレッジを組み込んだプロンプト
             system_prompt = f"""
