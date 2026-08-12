@@ -60,9 +60,9 @@ if st.button("返信文を生成する", type="primary"):
 """
 
             with st.spinner("加賀助のナレッジを参照して返信文を作成中..."):
-                # 最新モデル（gemini-2.5-flash）を新しい規格で呼び出し
+                # 最新モデル（gemini-3.5-flash）を新しい規格で呼び出し
                 response = client.models.generate_content(
-                    model='gemini-2.5-flash',
+                    model='gemini-3.5-flash',
                     contents=[system_prompt, f"クチコミ本文:\n{review_text}"]
                 )
 
