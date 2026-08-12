@@ -34,10 +34,18 @@ if st.button("返信文を生成する", type="primary"):
         st.warning("クチコミ本文を入力してください。")
     else:
         try:
-            # ★ 新しいSDK（google-genai）の通信方式
+            # 新しいSDK（google-genai）の通信方式
             client = genai.Client(api_key=api_key)
+            
+            # ★ 追加ロジック：クチコミの文字数を判定して指示を切り替える
+            review_length = len(review_text)
+            if review_length <= 700:
+                target_length = review_length * 2
+                length_rule = f"\n5. 【重要】お客様のクチコミが{review_length}文字です。返信文はその約2倍（{target_length}文字程度）のボリュームになるよう、当館の魅力や感謝の言葉をしっかり肉付けして作成してください。"
+            else:
+                length_rule = f"\n5. 【重要】お客様のクチコミが{review_length}文字と長文のため、簡潔かつ丁寧に要点をまとめた返信文を作成してください（無理に2倍にする必要はありません）。"
 
-            # ★加賀助のナレッジを組み込んだプロンプト
+            # 加賀助のナレッジを組み込んだプロンプト
             system_prompt = f"""
 あなたは温泉旅館「加賀助」の優秀なWeb担当者です。
 入力されたお客様からのクチコミに対し、以下の【加賀助の基本情報】を踏まえて適切な返信文を作成してください。
@@ -56,21 +64,19 @@ if st.button("返信文を生成する", type="primary"):
 1. 選択されたトーン設定: {tone}
 2. クチコミ内容を分析し、お褒めの言葉には感謝を、ご指摘やクレームには言い訳をせず誠実な謝罪と改善姿勢を示してください。
 3. 楽天トラベルやじゃらんnetにふさわしい丁寧でプロフェッショナルな「です・ます調」で作成してください。
-4. 前置きや解説は含めず、そのまま楽天トラベルの管理画面にコピペできる返信文章のみを出力してください。
+4. 前置きや解説は含めず、そのまま楽天トラベルの管理画面にコピペできる返信文章のみを出力してください。{length_rule}
 """
 
             with st.spinner("加賀助のナレッジを参照して返信文を作成中..."):
-                
-                # エラーの原因となる自動検索をやめ、最新の安定モデルを直接指名します
                 response = client.models.generate_content(
                     model='gemini-3.5-flash',
                     contents=[system_prompt, f"クチコミ本文:\n{review_text}"]
                 )
 
             st.success("作成が完了しました！")
-            st.subheader("生成された返信文（クリックでコピー）")
-            # そのままコピペしやすいコードブロック形式で表示
-            st.code(response.text, language=None)
+            
+            # ★ 修正箇所：横に伸びないように「テキストエリア（高さ300px）」で表示する
+            st.text_area("生成された返信文（枠内をクリックし、すべて選択してコピーしてください）", response.text, height=300)
 
         except Exception as e:
             st.error(f"エラーが発生しました: {e}")
