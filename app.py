@@ -1,5 +1,5 @@
 import streamlit as st
-import google.generativeai as genai
+from google import genai
 
 # 1. ページ基本設定
 st.set_page_config(page_title="加賀助 クチコミ返信ツール", page_icon="🏨")
@@ -34,16 +34,8 @@ if st.button("返信文を生成する", type="primary"):
         st.warning("クチコミ本文を入力してください。")
     else:
         try:
-            genai.configure(api_key=api_key)
-            
-            # あなたのAPIキーで現在利用可能なモデルを自動で一覧取得する
-            available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-            # その中から高速な「flash」モデルを優先的に探す
-            flash_models = [name for name in available_models if 'flash' in name.lower()]
-            # 見つかったモデルを自動で設定する
-            target_model_name = flash_models[0] if flash_models else available_models[0]
-            
-            model = genai.GenerativeModel(target_model_name)
+            # ★ 新しいSDK（google-genai）の通信方式
+            client = genai.Client(api_key=api_key)
 
             # ★加賀助のナレッジを組み込んだプロンプト
             system_prompt = f"""
@@ -63,12 +55,16 @@ if st.button("返信文を生成する", type="primary"):
 【返信作成ルール】
 1. 選択されたトーン設定: {tone}
 2. クチコミ内容を分析し、お褒めの言葉には感謝を、ご指摘やクレームには言い訳をせず誠実な謝罪と改善姿勢を示してください。
-3. 楽天トラベルにふさわしい丁寧でプロフェッショナルな「です・ます調」で作成してください。
+3. 楽天トラベルやじゃらんnetにふさわしい丁寧でプロフェッショナルな「です・ます調」で作成してください。
 4. 前置きや解説は含めず、そのまま楽天トラベルの管理画面にコピペできる返信文章のみを出力してください。
 """
 
             with st.spinner("加賀助のナレッジを参照して返信文を作成中..."):
-                response = model.generate_content([system_prompt, f"クチコミ本文:\n{review_text}"])
+                # 最新モデル（gemini-2.5-flash）を新しい規格で呼び出し
+                response = client.models.generate_content(
+                    model='gemini-2.5-flash',
+                    contents=[system_prompt, f"クチコミ本文:\n{review_text}"]
+                )
 
             st.success("作成が完了しました！")
             st.subheader("生成された返信文（クリックでコピー）")
