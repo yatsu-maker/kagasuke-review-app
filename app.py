@@ -2,8 +2,8 @@ import streamlit as st
 from google import genai
 
 # 1. ページ基本設定
-st.set_page_config(page_title="加賀助 クチコミ返信ツール", page_icon="🏨")
-st.title("🏨 加賀助 専用クチコミ返信ツール")
+st.set_page_config(page_title="加賀助 クチコミ返信ツール", page_icon="♨️")
+st.title("♨️ 加賀助 専用クチコミ返信ツール")
 st.caption("楽天トラベルなどのクチコミを貼り付けると、加賀助の情報に基づいた返信文を自動生成します。")
 
 # 2. APIキーの設定（アプリの設定画面から安全に読み込みます）
