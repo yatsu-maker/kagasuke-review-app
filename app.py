@@ -59,10 +59,20 @@ if st.button("返信文を生成する", type="primary"):
 4. 前置きや解説は含めず、そのまま楽天トラベルの管理画面にコピペできる返信文章のみを出力してください。
 """
 
-            with st.spinner("加賀助のナレッジを参照して返信文を作成中..."):
-                # 最新モデル（gemini-3.5-flash）を新しい規格で呼び出し
+                with st.spinner("加賀助のナレッジを参照して返信文を作成中..."):
+                
+                # 1. あなたのアカウントで現在利用可能なモデル一覧を自動取得する
+                available_models = client.models.list()
+                
+                # 2. その中から「flash」という名前がつくモデル（高速モデル）をリストアップ
+                flash_models = [m.name for m in available_models if 'flash' in m.name]
+                
+                # 3. 見つかった最新のモデルを自動設定（万が一見つからない時の予備として 'gemini-flash' を設定）
+                target_model = flash_models[0] if flash_models else 'gemini-flash'
+                
+                # 4. 自動選択されたモデルで返信文を生成する
                 response = client.models.generate_content(
-                    model='gemini-3.5-flash',
+                    model=target_model,
                     contents=[system_prompt, f"クチコミ本文:\n{review_text}"]
                 )
 
