@@ -35,7 +35,7 @@ if st.button("返信文を生成する", type="primary"):
     else:
         try:
             genai.configure(api_key=api_key)
-            model = genai.GenerativeModel('gemini-2.5-flash')
+            model = genai.GenerativeModel('gemini-flash')
 
             # ★加賀助のナレッジを組み込んだプロンプト
             system_prompt = f"""
