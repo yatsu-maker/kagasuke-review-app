@@ -6,6 +6,83 @@ st.set_page_config(page_title="加賀助 クチコミ返信ツール", page_icon
 st.title("♨️ 加賀助 専用クチコミ返信ツール")
 st.caption("楽天トラベルなどのクチコミを貼り付けると、加賀助の情報に基づいた返信文を自動生成します。")
 
+import streamlit as st
+from google import genai
+
+# 1. ページ基本設定
+st.set_page_config(page_title="加賀助 クチコミ返信ツール", page_icon="♨️", layout="centered")
+
+# ------------------------------------------------------------------
+# ★ここから追加：洗練されたデザインにするためのカスタムCSS
+# ------------------------------------------------------------------
+st.markdown("""
+<style>
+    /* 全体の背景色をわずかにグレーにして落ち着きを出す */
+    .stApp {
+        background-color: #F8F9FA;
+        font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+    }
+    
+    /* タイトルのスタイル（ダークネイビーで高級感を） */
+    h1 {
+        color: #2C3E50;
+        font-weight: 600;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #E0E0E0;
+        margin-bottom: 30px;
+    }
+    
+    /* 入力枠（テキストエリア）のスタイル：白背景、角丸、うっすら影をつける */
+    .stTextArea textarea {
+        background-color: #FFFFFF;
+        border: 1px solid #E0E0E0;
+        border-radius: 8px;
+        padding: 15px;
+        font-size: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    
+    /* トーン選択（ラジオボタン）の枠を整える */
+    div[role="radiogroup"] {
+        background-color: #FFFFFF;
+        padding: 15px 20px;
+        border: 1px solid #E0E0E0;
+        border-radius: 8px;
+    }
+
+    /* 生成ボタンのスタイル：ダークネイビー、立体感、マウスオンでフワッと動く */
+    .stButton>button {
+        background-color: #2C3E50;
+        color: white;
+        border-radius: 8px;
+        padding: 10px 24px;
+        font-weight: bold;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        width: 100%; /* ボタンを横幅いっぱいに広げる */
+    }
+    
+    /* ボタンにマウスを乗せたときの動き */
+    .stButton>button:hover {
+        background-color: #1A252F;
+        color: white;
+        box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        transform: translateY(-2px); /* 少し上に浮く */
+    }
+</style>
+""", unsafe_allow_html=True)
+# ------------------------------------------------------------------
+# ★追加ここまで
+# ------------------------------------------------------------------
+
+# 2. APIキーの設定（アプリの設定画面から安全に読み込みます）
+# （※これ以降のコードは今のままで変更不要です）
+api_key = st.secrets.get("GEMINI_API_KEY", "")
+# ...続く...
+
+
+
 # 2. APIキーの設定（アプリの設定画面から安全に読み込みます）
 api_key = st.secrets.get("GEMINI_API_KEY", "")
 
