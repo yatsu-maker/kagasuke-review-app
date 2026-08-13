@@ -3,19 +3,7 @@ from google import genai
 
 # 1. ページ基本設定
 st.set_page_config(page_title="加賀助 クチコミ返信ツール", page_icon="♨️")
-st.title("♨️ 加賀助 専用クチコミ返信ツール")
-st.caption("楽天トラベルなどのクチコミを貼り付けると、加賀助の情報に基づいた返信文を自動生成します。")
 
-import streamlit as st
-from google import genai
-
-# 1. ページ基本設定
-st.set_page_config(page_title="加賀助 クチコミ返信ツール", page_icon="♨️", layout="centered")
-
-# ------------------------------------------------------------------
-# ★ここから追加：洗練されたデザインにするためのカスタムCSS
-# ------------------------------------------------------------------
-st.markdown("""
 # ------------------------------------------------------------------
 # ★ここから追加：洗練されたデザインにするためのカスタムCSS
 # ------------------------------------------------------------------
@@ -31,7 +19,7 @@ st.markdown("""
     h1 {
         color: #2C3E50;
         font-weight: 600;
-        font-size: 26px !important; /* ←ここで文字サイズを小さく調整しています */
+        font-size: 26px !important;
         padding-bottom: 10px;
         border-bottom: 2px solid #E0E0E0;
         margin-bottom: 30px;
@@ -65,7 +53,7 @@ st.markdown("""
         border: none;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         transition: all 0.3s ease;
-        width: 100%; /* ボタンを横幅いっぱいに広げる */
+        width: 100%;
     }
     
     /* ボタンにマウスを乗せたときの動き */
@@ -73,7 +61,7 @@ st.markdown("""
         background-color: #1A252F;
         color: white;
         box-shadow: 0 6px 8px rgba(0,0,0,0.15);
-        transform: translateY(-2px); /* 少し上に浮く */
+        transform: translateY(-2px);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -81,13 +69,8 @@ st.markdown("""
 # ★追加ここまで
 # ------------------------------------------------------------------
 
-
-# 2. APIキーの設定（アプリの設定画面から安全に読み込みます）
-# （※これ以降のコードは今のままで変更不要です）
-api_key = st.secrets.get("GEMINI_API_KEY", "")
-# ...続く...
-
-
+st.title("♨️ 加賀助 専用クチコミ返信ツール")
+st.caption("楽天トラベルなどのクチコミを貼り付けると、加賀助の情報に基づいた返信文を自動生成します。")
 
 # 2. APIキーの設定（アプリの設定画面から安全に読み込みます）
 api_key = st.secrets.get("GEMINI_API_KEY", "")
@@ -120,7 +103,7 @@ if st.button("返信文を生成する", type="primary"):
             # 新しいSDK（google-genai）の通信方式
             client = genai.Client(api_key=api_key)
             
-            # ★ 追加ロジック：クチコミの文字数を判定して指示を切り替える
+            # クチコミの文字数を判定して指示を切り替える
             review_length = len(review_text)
             if review_length <= 700:
                 target_length = review_length * 2
@@ -158,7 +141,7 @@ if st.button("返信文を生成する", type="primary"):
 
             st.success("作成が完了しました！")
             
-            # ★ 修正箇所：横に伸びないように「テキストエリア（高さ300px）」で表示する
+            # テキストエリア（高さ300px）で表示
             st.text_area("生成された返信文（枠内をクリックし、すべて選択してコピーしてください）", response.text, height=300)
 
         except Exception as e:
