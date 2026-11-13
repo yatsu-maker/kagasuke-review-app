@@ -23,19 +23,18 @@ st.caption("クチコミを貼り付けるか、画像をアップロードす�
 api_key = st.secrets.get("GEMINI_API_KEY", "")
 if not api_key: api_key = st.sidebar.text_input("Gemini API Key", type="password")
 
-# ★フォームで囲み、Ctrl+Enterに対応させる
 with st.form("review_form"):
     review_text = st.text_area("お客様からのクチコミ本文（テキスト）：", height=150)
+    
     uploaded_file = st.file_uploader("クチコミの画像（スクリーンショット）を「コピーして貼り付け」または\n「ドラッグ＆ドロップ」", type=["png", "jpg", "jpeg"])
+    # ★スタッフ向けの注意書きを追加
+    st.caption("⚠️ **ご注意**：AIが文字を視覚的に解析するため、画像の読み取りはテキスト入力よりも生成に時間がかかります。")
+    
     tone = st.radio("返信の方向性：", ["標準（丁寧・誠実）", "感謝強調（高評価向け）", "お詫び・改善強調（低評価向け）"], horizontal=True)
     
-    # スタッフ向けの案内文
     st.caption("💡 **ヒント**：入力後にキーボードの **Ctrl ＋ Enter**（Macは ⌘ ＋ Enter）を押すことでも生成をスタートできます。")
-    
-    # フォーム用の送信ボタン
     submitted = st.form_submit_button("返信文を生成する", type="primary")
 
-# ★送信されたあとの処理
 if submitted:
     if not api_key: st.error("APIキーが設定されていません。")
     elif not review_text and not uploaded_file: st.warning("クチコミ本文を入力するか、画像をアップロードしてください。")
@@ -64,4 +63,18 @@ if submitted:
 5. 最後に改行して「鶯宿温泉 加賀助」と記名する。"""
 
             ai_contents = [system_prompt]
-            if review_text
+            if review_text: ai_contents.append(f"クチコミ本文:\n{review_text}")
+            if uploaded_file: ai_contents.extend(["以下の画像を読み取って返信を作成してください：", Image.open(uploaded_file)])
+
+            with st.spinner("作成中..."):
+                response_stream = client.models.generate_content_stream(model='gemini-3.5-flash', contents=ai_contents)
+                placeholder = st.empty()
+                full_response = ""
+                for chunk in response_stream:
+                    if chunk.text:
+                        full_response += chunk.text
+                        placeholder.markdown(full_response + "▌")
+                placeholder.empty()
+            st.success("完了しました！")
+            st.text_area("生成された返信文", full_response, height=300)
+        except Exception as e: st.error(f"⚠️ エラーが発生しました。時間を置いてお試しください。詳細: {e}")
